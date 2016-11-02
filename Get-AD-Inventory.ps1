@@ -4,8 +4,6 @@ filename....... Get-AD-Inventory.ps1
 
 author......... David Stein
 
-organization... En Pointe Technologies
-
 date........... 11/16/2015
 
 modified....... 09/17/2016
