@@ -1,4 +1,8 @@
-﻿[cmdletbinding()]
+<#
+UNFINISHED!
+#>
+
+[cmdletbinding()]
 param()
 
 $Sites = [System.DirectoryServices.ActiveDirectory.Forest]::GetCurrentForest().Sites
