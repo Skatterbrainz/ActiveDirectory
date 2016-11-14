@@ -1,0 +1,8 @@
+GroupName,GroupType,GroupLocation
+SCCM Admins,Global,"OU=AdminGroups,OU=Corp"
+SCOM Admins,Global,"OU=AdminGroups,OU=Corp"
+SCSM Admins,Global,"OU=AdminGroups,OU=Corp"
+SCORCH Admins,Global,"OU=AdminGroups,OU=Corp"
+SCVMM Admins,Global,"OU=AdminGroups,OU=Corp"
+SQL Admins,Global,"OU=AdminGroups,OU=Corp"
+Desktop Admins,Global,"OU=AdminGroups,OU=Corp"
