@@ -2,15 +2,16 @@
 # Author: James Brennan, EnPointe
 # Destroyer: David Stein, EnPointe
 #
-# Version 1.2
-# 09/17/2016
+# Version 1.3 - 2017.07.27.01
 #
 ### Requires the following modules:
 ### ActiveDirectory, DNSServer, GroupPolicy, BestPractices
 #
 # 051016 - JB - Added parameters to specify forest and collected data
 # 091716 - DS - Ran through tidy-ish formatting and minor changes
+# 072717 - DS - clean up and formatting
 #>
+[CmdletBinding()]
 Param(
     [parameter(Mandatory=$False)] [string] $ADForest,
     [parameter(Mandatory=$False)] [switch] $getAll,
@@ -21,12 +22,11 @@ Param(
     [parameter(Mandatory=$False)] [switch] $getSites,
     [parameter(Mandatory=$False)] [switch] $getGPO,
     [parameter(Mandatory=$False)] [switch] $getReplication,
-    [parameter(Mandatory=$False)] [switch] $getMissingSubnets
+    [parameter(Mandatory=$False)] [switch] $getMissingSubnets,
+    [parameter(Mandatory=$False)] [string] $DataPath = ".\Data"
 )
-#
-Import-Module ActiveDirectory
-Import-Module GroupPolicy
-[string] $DataPath = ".\Data"
+
+Import-Module ActiveDirectory,GroupPolicy -Verbose:$False
 
 Function Get-ActiveDirectoryForestObject {
     Param ([string]$ForestName, [System.Management.Automation.PsCredential]$Credential)
