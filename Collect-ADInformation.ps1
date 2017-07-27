@@ -1,18 +1,40 @@
-<### Collect Active Directory information
-# Author: James Brennan, EnPointe
-# Destroyer: David Stein, EnPointe
-#
-# Version 1.3 - 2017.07.27.01
-#
-### Requires the following modules:
-### ActiveDirectory, DNSServer, GroupPolicy, BestPractices
-#
-# 051016 - JB - Added parameters to specify forest and collected data
-# 091716 - DS - Ran through tidy-ish formatting and minor changes
-# 072717 - DS - clean up and formatting
+#requires -modules ActiveDirectory,GroupPolicy,BestPractices
+<#
+.DESCRIPTION
+	Collect Active Directory information
+.PARAMETER ADForest
+
+.PARAMETER getAll
+
+.PARAMETER getDC
+
+.PARAMETER getAD
+
+.PARAMETER getDNS
+
+.PARAMETER getDHCP
+
+.PARAMETER getSites
+
+.PARAMETER getGPO
+
+.PARAMETER getReplication
+
+.PARAMETER getMissingSubnets
+
+.PARAMETER DataPath
+	default = ".\Data"
+
+.NOTES
+	Author: James Brennan
+	Destroyer: David Stein
+	Version 1.3 - 2017.07.27.01
+	# 051016 - JB - Added parameters to specify forest and collected data
+	# 091716 - DS - Ran through tidy-ish formatting and minor changes
+	# 072717 - DS - clean up and formatting
 #>
 [CmdletBinding()]
-Param(
+Param (
     [parameter(Mandatory=$False)] [string] $ADForest,
     [parameter(Mandatory=$False)] [switch] $getAll,
     [parameter(Mandatory=$False)] [switch] $getDC,
