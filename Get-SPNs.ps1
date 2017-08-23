@@ -1,22 +1,29 @@
-#Set Search
-cls
+#requires -version 2
+<#
+.SYNOPSIS
+    Return AD ServicePrinciple names
+.PARAMETER Name
+    [string] (optional) filter object by name
+.NOTES
+    DS - 03/20/2015
+#>
+param (
+    [parameter(Mandatory=$False, ValueFromPipeline=$True)]
+    [string] $Name = ""
+)
 $search = New-Object DirectoryServices.DirectorySearcher([ADSI]"")
 $search.filter = "(servicePrincipalName=*)"
 $results = $search.Findall()
 
-#list results
-foreach($result in $results)
-{
-       $userEntry = $result.GetDirectoryEntry()
-       Write-host "Object Name = " $userEntry.name -backgroundcolor "yellow" -foregroundcolor "black"
-       Write-host "DN      =      "  $userEntry.distinguishedName
-       Write-host "Object Cat. = "  $userEntry.objectCategory
-       Write-host "servicePrincipalNames"
-       $i=1
-       foreach($SPN in $userEntry.servicePrincipalName)
-       {
-           Write-host "SPN(" $i ")   =      " $SPN       $i+=1
-       }
-       Write-host ""
-
-} 
+foreach($result in $results) {
+    $userEntry = $result.GetDirectoryEntry()
+    if (($Name -eq "") -or (($Name -ne "") -and ($userEntry.name -like "$Name"))) {
+        $data = [ordered]@{
+            Name = $userEntry.name
+            DistinguishedName = $userEntry.distinguishedName.ToString()
+            ObjectCategory = $userEntry.objectCategory
+            SPNList = $userEntry.servicePrincipalName
+        }
+        Write-Output $data
+    }
+}
