@@ -2,8 +2,9 @@ function Get-ADAccount {
     param (
         [string] $Name
     )
-    if ($Name.ToUpper().StartsWith($env:USERDOMAIN)) {
-        $Name = $Name.ToUpper().Replace("$env:USERDOMAIN`\", "")
+    if ($Name.Contains('\')) {
+        $Domain = $Name.Split('\')[0]
+        $Name   = $Name.Split('\')[1]
     }
     $strFilter   = "(&(objectCategory=*)(samAccountName=$Name))"
     $objSearcher = New-Object System.DirectoryServices.DirectorySearcher
