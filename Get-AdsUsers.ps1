@@ -1,5 +1,6 @@
 <#
 .DESCRIPTION
+    Returns AD LDAP information for User accounts
 .PARAMETER UserName
     Optional: name of user to query. Default is all users
 .EXAMPLE
