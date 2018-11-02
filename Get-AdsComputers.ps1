@@ -3,26 +3,33 @@
     Returns AD LDAP information for Computer accounts
 .PARAMETER ComputerName
     Optional: name of one computer to query. Default is all computers
+.PARAMETER Disabled
+    Optional: return only disabled computers (ignores ComputerName input)
 .EXAMPLE
     $x = .\Get-ADsComputers.ps1
 .EXAMPLE
     $x = .\Get-ADsComputers.ps1 -ComputerName "DT12345"
-.NOTES
-    1.0.0 - DS - initial glue-sniffing disaster that somehow worked
-    1.0.1 - DS - added ComputerName param for focused search
+.EXAMPLE
+    $x = .\Get-ADsComputers.ps1 -Disabled
 #>
 
 [CmdletBinding()]
 param (
     [parameter(Mandatory=$False, HelpMessage="Name of computer to query")]
-    [string] $ComputerName = ""
+    [string] $ComputerName = "",
+    [switch] $Disabled
 )
 $pageSize = 200
 if (![string]::IsNullOrEmpty($ComputerName)) {
     $as = [adsisearcher]"(&(objectCategory=Computer)(name=$ComputerName))"
 }
 else {
-    $as = [adsisearcher]"(objectCategory=Computer)"
+    if ($Disabled) {
+        $as = [adsisearcher]"(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=2))"
+    }
+    else {
+        $as = [adsisearcher]"(objectCategory=Computer)"
+    }
 }
 $as.PropertiesToLoad.Add('cn') | Out-Null
 $as.PropertiesToLoad.Add('lastlogonTimeStamp') | Out-Null
