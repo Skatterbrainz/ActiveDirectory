@@ -3,32 +3,48 @@
     Returns AD LDAP information for Computer accounts
 .PARAMETER ComputerName
     Optional: name of one computer to query. Default is all computers
-.PARAMETER Disabled
-    Optional: return only disabled computers (ignores ComputerName input)
+.PARAMETER SearchType
+    List: All, Disabled, Workstations, Servers (default = All)
 .EXAMPLE
     $x = .\Get-ADsComputers.ps1
 .EXAMPLE
     $x = .\Get-ADsComputers.ps1 -ComputerName "DT12345"
 .EXAMPLE
-    $x = .\Get-ADsComputers.ps1 -Disabled
+    $x = .\Get-ADsComputers.ps1 -SearchType Disabled
+.EXAMPLE
+    $x = .\Get-ADsComputers.ps1 -SearchType Servers
 #>
 
 [CmdletBinding()]
 param (
     [parameter(Mandatory=$False, HelpMessage="Name of computer to query")]
     [string] $ComputerName = "",
-    [switch] $Disabled
+    [parameter(Mandatory=$False, HelpMessage="Search type")]
+    [ValidateSet('All','Disabled','Workstations','Servers')]
+    [string] $SearchType = 'All'
 )
 $pageSize = 200
 if (![string]::IsNullOrEmpty($ComputerName)) {
     $as = [adsisearcher]"(&(objectCategory=Computer)(name=$ComputerName))"
 }
 else {
-    if ($Disabled) {
-        $as = [adsisearcher]"(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=2))"
-    }
-    else {
-        $as = [adsisearcher]"(objectCategory=Computer)"
+    switch ($SearchType) {
+        'Disabled' {
+            $as = [adsisearcher]"(&(objectCategory=computer)(userAccountControl:1.2.840.113556.1.4.803:=2))"
+            break
+        }
+        'Workstations' {
+            $as = [adsisearcher]"(&(objectCategory=computer)(!operatingSystem=*server*))"
+            break
+        }
+        'Servers' {
+            $as = [adsisearcher]"(&(objectCategory=computer)(operatingSystem=*server*))"
+            break
+        }
+        default {
+            $as = [adsisearcher]"(objectCategory=computer)"
+            break
+        }
     }
 }
 $as.PropertiesToLoad.Add('cn') | Out-Null
