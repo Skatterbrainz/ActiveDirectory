@@ -5,6 +5,17 @@
   Days since last account login. Default is 30
 .PARAMETER RowLimit
   Limit results to prevent performance impact. Default is 100 rows
+.EXAMPLE
+  $oldAccounts = Get-OldADComputerAccounts -DaysOld 90 -RowLimit 1000
+  foreach ($pc in $oldAccounts) {
+    Move-ADComputer -Name $pc.ComputerName -OU $TargetOU
+  }
+.EXAMPLE
+  $oldAccounts = Get-OldADComputerAccounts -DaysOld 180
+  $oldAccounts | Foreach-Object {
+      $dn = $_.DN
+      $([adsi]"LDAP://$dn").DeleteTree()
+  }
 #>
 
 function Get-OldADComputerAccounts {
