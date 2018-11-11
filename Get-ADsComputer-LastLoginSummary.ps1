@@ -1,4 +1,4 @@
-<#
+﻿<#
 .DESCRIPTION
     Display summary of last-login age (days) for computer accounts in AD
 .PARAMETER DaysOld
@@ -35,7 +35,7 @@ function Get-Pct {
 }
 
 Write-Host "getting computer accounts from active directory..." -ForegroundColor Cyan
-$all = .\Get-AdsComputers.ps1
+$all = .\tools\Get-AdsComputers.ps1
 $xcount = $all.Count
 Write-Verbose "$xcount accounts returned from query"
 
