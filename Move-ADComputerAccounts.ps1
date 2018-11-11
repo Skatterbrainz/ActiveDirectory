@@ -19,9 +19,7 @@ param (
         [ValidateRange(0,1000)]
         [int] $DaysOld = 90
 )
-
-$oldComputers = .\tools\Get-ADsComputers.ps1 | 
-    Where-Object { (New-TimeSpan -Start $_.LastLogon -End $(Get-Date)).Days -gt $DaysOld }
+$oldComputers = Get-OldADComputerAccounts -DaysOld $DaysOld | Select-Object -ExpandProperty ComputerName
 
 Write-Host "$($oldComputers.Count) computers haven't logged onto the domain in $DaysOld days" -ForegroundColor Magenta
 
