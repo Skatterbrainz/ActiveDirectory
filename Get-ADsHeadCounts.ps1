@@ -40,20 +40,23 @@ function Get-AdsComputers {
 
 $adcomps = Get-AdsComputers
 
-$win    = $adcomps | ? {$_.os -match 'windows'}
-$other  = $adcomps | ? {$_.os -notmatch 'windows'}
-$winsvr = $win | ? {$_.os -match 'server'}
-$winwks = $win | ? {$_.os -notmatch 'server'}
-$win10  = $win | ? {$_.os -match 'windows 10'}
+$win    = $adcomps | Where-Object {$_.os -match 'windows'}
+$other  = $adcomps | Where-Object {$_.os -notmatch 'windows'}
+$winsvr = $win | Where-Object {$_.os -match 'server'}
+$winwks = $win | Where-Object {$_.os -notmatch 'server'}
+$win10  = $win | Where-Object {$_.os -match 'windows 10'}
 
-$ll90   = $adcomps | ? { (New-TimeSpan -Start $_.LastLogon -End (Get-Date)).TotalDays -gt 90 }
-$ll180  = $adcomps | ? { (New-TimeSpan -Start $_.LastLogon -End (Get-Date)).TotalDays -gt 180 }
+$ll90   = $adcomps | Where-Object { (New-TimeSpan -Start $_.LastLogon -End (Get-Date)).TotalDays -gt 90 }
+$ll180  = $adcomps | Where-Object { (New-TimeSpan -Start $_.LastLogon -End (Get-Date)).TotalDays -gt 180 }
 
-Write-Host "Total Computer Accounts.... $($adcomps.Count)"
-Write-Host "Windows computers.......... $($win.Count)"
-Write-Host "Non-Windows computers...... $($other.Count)"
-Write-Host "Windows Workstations....... $($winwks.Count)"
-Write-Host "        Windows 10 only.... $($win10.Count)"
-Write-Host "Windows Servers............ $($winsvr.Count)"
-Write-Host "Last logon > 90 days....... $($ll90.Count)"
-Write-Host "Last logon > 180 days...... $($ll180.Count)"
+$output = [ordered]@{
+    TotalComputerAccounts = $($adcomps.Count)
+    WindowsComputers = $($win.Count)
+    NonWindowsComputers = $($other.Count)
+    WindowsWorkstations = $($winwks.Count)
+    Windows10only = $($win10.Count)
+    WindowsServers = $($winsvr.Count)
+    LastLogon90days = $($ll90.Count)
+    LastLogon180days = $($ll180.Count)
+}
+New-Object PSObject -Property $output
