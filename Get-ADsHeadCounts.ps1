@@ -10,6 +10,7 @@ function Get-AdsComputers {
     [void]$as.PropertiesToLoad.Add('operatingSystemVersion')
     [void]$as.PropertiesToLoad.Add('distinguishedName')
     [void]$as.PropertiesToLoad.Add('servicePrincipalName')
+    # increase page size if you have a metric crap-ton of computers in your domain
     $as.PageSize = 2000
     $results = $as.FindAll()
     foreach ($item in $results) {
