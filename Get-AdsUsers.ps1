@@ -13,6 +13,7 @@ function Get-ADsUsers {
 .NOTES
     1.0.0 - DS - Initial release
     1.0.1 - DS - Added UserName parameter for focused search
+    1.0.2 - DS - Added userPrincipalName (UPN) to output
 #>
     [CmdletBinding()]
     param (
@@ -29,6 +30,7 @@ function Get-ADsUsers {
     [void]$as.PropertiesToLoad.Add('cn')
     [void]$as.PropertiesToLoad.Add('sAMAccountName')
     [void]$as.PropertiesToLoad.Add('lastlogonTimeStamp')
+    [void]$as.PropertiesToLoad.Add('userPrincipalName')
     [void]$as.PropertiesToLoad.Add('whenCreated')
     [void]$as.PropertiesToLoad.Add('department')
     [void]$as.PropertiesToLoad.Add('title')
@@ -52,6 +54,7 @@ function Get-ADsUsers {
             Title       = ($item.Properties.item('title') | Out-String).Trim()
             Department  = ($item.Properties.item('department') | Out-String).Trim()
             DN          = ($item.Properties.item('distinguishedName') | Out-String).Trim()
+            UPN         = ($item.Properties.item('userPrincipalName') | Out-String).Trim()
             EmployeeID  = ($item.Properties.item('employeeid') | Out-String).Trim()
             Email       = ($item.Properties.item('mail') | Out-String).Trim()
             Manager     = ($item.Properties.item('manager') | Out-String).Trim()
