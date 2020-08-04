@@ -81,7 +81,8 @@ try {
     $comps = $comps |
         Select-Object Name,lastLogonTimestamp,operatingSystem,operatingSystemVersion,description,distinguishedName,ObjectGUID |
             Foreach-Object {
-                Write-Host "[$i] of [$total] $($_.Name) ..." -ForegroundColor Cyan
+                #Write-Host "[$i] of [$total] $($_.Name) ..." -ForegroundColor Cyan
+                Write-Progress -Activity "Getting AD Computers" -Status "Reading computer" -PercentComplete $(($i/$total)*100) -CurrentOperation "$i of $total"
                 if ([string]::IsNullOrEmpty($_.lastLogonTimestamp)) {
                     $llogon = $null
                     $ldays  = $null
@@ -104,13 +105,13 @@ try {
 
     if ($IncludeUsers) {
         Write-Host "getting users"
-        $users = Get-ADUser -Credential $Credential -Filter * -Properties displayName,lastLogonTimestamp,title,department -Server $Server
+        $users = Get-ADUser -Credential $Credential -Filter * -Properties displayName,lastLogonTimestamp,description -Server $Server
         $total = $users.Count
         $i = 1
         $users = $users |
             Select-object SamAccountName,GivenName,SurName,UserPrincipalName,displayName,description,Enabled,SID,ObjectGUID,lastLogonTimestamp,distinguishedName |
                 Foreach-Object {
-                    Write-Host "[$i] of [$total] $($_.SamAccountName) ..." -ForegroundColor Cyan
+                    Write-Progress -Activity "Getting AD Computers" -Status "Reading user" -PercentComplete $(($i/$total)*100) -CurrentOperation "$i of $total"
                     if ([string]::IsNullOrEmpty($_.lastLogonTimestamp)) {
                         $llogon = $null
                         $ldays  = $null
