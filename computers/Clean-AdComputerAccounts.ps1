@@ -98,9 +98,7 @@ try {
 			Write-LogFile "no action required on this computer account"
 		}
 	}
-
 	Write-LogFile "**** processing completed successfully ****"
-}
-catch {
+} catch {
 	Write-Error $_.Exception.Message
 }
