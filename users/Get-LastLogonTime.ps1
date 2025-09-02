@@ -3,7 +3,8 @@
 	Get last AD login timestamp from all Domain Controllers
 .DESCRIPTION
 	Get the lastLogon attribute value from all domain controllers in the 
-	current AD domain.
+	current AD domain. Some situations may require this approach versus
+	reading the (GC-replicated) lastLogonTimestamp attribute.
 .PARAMETER Name
 	Required. LDAP (name) attribute value.
 .PARAMETER ObjectType
