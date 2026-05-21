@@ -66,18 +66,22 @@ if ($PSCmdlet.MyInvocation.BoundParameters["WhatIf"].IsPresent) {
     $bWhatIf = $True
     Write-Verbose "WhatIf: True"
 }
-<#
-.DESCRIPTION
-    Show a progress bar during script execution
-.PARAMETER Caption 
-.PARAMETER Message 
-.PARAMETER CurrentIndex 
-.PARAMETER TotalCount 
-.EXAMPLE 
-.NOTES
-#>
 
 Function Show-Progress {
+	<#
+	.DESCRIPTION
+		Show a progress bar during script execution
+	.PARAMETER Caption
+		Required. Text to display in the progress bar caption.
+	.PARAMETER Message 
+		Required. Text to display in the progress bar message.
+	.PARAMETER CurrentIndex 
+		Required. Current index or count of items processed.
+	.PARAMETER TotalCount 
+		Required. Total number of items to process.
+	.EXAMPLE
+		Show-Progress -Caption "Processing" -Message "Processing item 5 of 100" -CurrentIndex 5 -TotalCount 100
+	#>
     param (
         [parameter(Mandatory=$True)] [string] $Caption = "Progress",
         [parameter(Mandatory=$False)] [string] $Message = "Please wait...",
@@ -89,16 +93,16 @@ Function Show-Progress {
     #Start-Sleep 1
 }
 
-<#
-.DESCRIPTION
-Returns an array of column names from a specified CSV file
-Ignores column headings which have an underscore prefix "_"
-
-.PARAMETER InputFile
-[string] path and filename of input CSV file
-#>
 
 function Get-UserAttributes {
+	<#
+	.DESCRIPTION
+	Returns an array of column names from a specified CSV file
+	Ignores column headings which have an underscore prefix "_"
+
+	.PARAMETER InputFile
+	[string] path and filename of input CSV file
+	#>
     param (
         [parameter(Mandatory=$True)] [string] $InputFile 
     )
@@ -125,8 +129,7 @@ Write-Verbose "info: loaded $csvRows entries"
 if ($Attributes -ne "") {
     Write-Verbose "info: processing explicit attributes"
     $attnum = $Attributes.Count
-}
-else {
+} else {
     Write-Verbose "info: processing all attributes"
     $Attributes = Get-UserAttributes -InputFile $Filename
     $attnum = $Attributes.Count
@@ -138,12 +141,8 @@ foreach ($row in $csvData) {
     $sam = $row.samaccountname
     if ($bVerbose = $True) {
         Write-Host "Updating $($counter+1) of $csvRows`: $sam" -ForegroundColor Green
-    }
-    else {
-        Show-Progress -Caption "Updating Accounts" `
-            -Message "Updating $($counter+1) of $csvRows`: $sam" `
-            -CurrentIndex $counter+1 `
-            -TotalCount $csvRows
+    } else {
+        Show-Progress -Caption "Updating Accounts" -Message "Updating $($counter+1) of $csvRows`: $sam" -CurrentIndex ($counter+1) -TotalCount $csvRows
     }
     
     foreach ($att in $Attributes) {
@@ -152,8 +151,7 @@ foreach ($row in $csvData) {
             Write-Verbose "`tattribute: $att"
             Write-Verbose "`tvalue (multi-valued): $val"
             $nval = $val.Split(";")
-        }
-        else {
+        } else {
             Write-Verbose "`tattribute: $att"
             Write-Verbose "`tvalue (single-value): $val"
             $nval = $val
@@ -161,13 +159,11 @@ foreach ($row in $csvData) {
         try {
             if ($bWhatIf -eq $True) {
                 Set-ADUser -Identity $sam -replace @{"$att"=$nval} -WhatIf
-            }
-            else {
+            } else {
                 Set-ADUser -Identity $sam -replace @{"$att"=$nval} -Confirm:$False
             }
             
-        }
-        catch {
+        } catch {
             Write-Warning "[$($counter+1)] $sam -- $att could not be updated"
         }
     }
