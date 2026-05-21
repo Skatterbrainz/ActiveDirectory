@@ -8,7 +8,7 @@ function Get-AdsAccounts {
 	try {
 		$as = [adsisearcher]"(objectCategory=$AccountType)"
 		$props = @("name","distinguishedName","lastLogonTimeStamp")
-		$props | %{ $as.PropertiesToLoad.Add($_) | Out-Null }
+		$props | Foreach-Object { $as.PropertiesToLoad.Add($_) | Out-Null }
 		$as.PageSize = 2000
 		$accounts = $as.FindAll()
 		foreach ($account in $accounts) {
