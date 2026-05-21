@@ -51,7 +51,7 @@ try {
 		throw "Passwords do not match"
 	}
 	$params = @{
-		Name = $username
+		Name     = $username
 		Password = $password
 	}
 	if (![string]::IsNullOrWhiteSpace($desc)) {
