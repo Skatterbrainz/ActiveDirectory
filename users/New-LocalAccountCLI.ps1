@@ -36,8 +36,8 @@ try {
 		throw "Invalid username: Must be 1-20 chars in length, and A-Z, a-z, 0-9"
 	}
 	$params = @{
-		Name = $username
-		Password = $Password
+		Name        = $username
+		Password    = $Password
 		Description = $Description
 	}
 	$user = New-LocalUser @params
@@ -46,8 +46,8 @@ try {
 		Status   = 'Success'
 		Message  = "Account created"
 		UserName = $username
-		RunOn = $env:COMPUTERNAME
-		RunAs = $env:USERNAME
+		RunOn    = $env:COMPUTERNAME
+		RunAs    = $env:USERNAME
 	}
 } catch {
 	$msg = $_.Exception.Message
@@ -55,8 +55,8 @@ try {
 		Status   = 'Error'
 		Message  = $msg
 		UserName = $username
-		RunOn = $env:COMPUTERNAME
-		RunAs = $env:USERNAME
+		RunOn    = $env:COMPUTERNAME
+		RunAs    = $env:USERNAME
 	}
 } finally {
 	Write-Output $result
