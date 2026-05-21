@@ -76,7 +76,7 @@ function Get-UserAttributes
 	$attlist  = @()
 	  $csvRaw   = Get-Content -Path $InputFile
 	  $attlist  = $csvRaw[0].ToLower().Split(",") | ? {$_ -notlike "_*"}
-	  $attlist  = $attlist | ? {$_ -ne "samaccountname"} | ? {$_ -ne "name"} | ? {$_ -ne "path"}
+	  $attlist  = $attlist | Where-Object {$_ -ne "samaccountname"} | ? {$_ -ne "name"} | ? {$_ -ne "path"}
 	return $attlist
 }
 
@@ -105,18 +105,13 @@ function New-RandomPassword
 	$letters = 65..90 + 97..122
 	$password = Get-Random -Count $Length `
 		-Input ($punc + $digits + $letters) |
-			% -Begin { $aa = $null } `
-			-Process {$aa += [char]$_} `
-			-End {$aa}
+			Foreach-Object -Begin { $aa = $null } -Process {$aa += [char]$_} -End {$aa}
 	return $password
 }
 
-if (!(Test-Path $csvfile)) 
-{
+if (!(Test-Path $csvfile)) {
 	Write-Host "error: $csvfile not found"
-}
-else 
-{
+} else {
 	$rowNum = 1
 
 	$attlist  = Get-UserAttributes -InputFile $CsvFile
@@ -125,36 +120,28 @@ else
 
 	Write-Verbose "info: reading input data file..."
 	$csvData = Import-Csv -Path $CsvFile | ? {$_._LOAD -eq 1}
-	if ($RowLimit -gt 0) 
-	{
+	if ($RowLimit -gt 0) {
 		$csvData = $csvData[0..$($RowLimit-1)]
 	}
 	$csvRows = $csvData.Count
 	Write-Verbose "info: loaded $csvRows entries"
 
 	Write-Verbose "info: processing accounts..."
-	foreach ($row in $csvData) 
-	{
+	foreach ($row in $csvData) {
 		$sam   = $row.sAMAccountName
 		$upath = $row.PATH
 		$uname = $sam
 		Write-Verbose "info: [$rowNum] user = $sam"
 		Write-Verbose "info: [$rowNum] path = $upath"
-		if ($Randomize -eq $True) 
-		{
+		if ($Randomize -eq $True) {
 			$rpwd = New-RandomPassword -Length 32
-		}
-		else 
-		{
+		} else {
 			$rpwd = $DefaultPwd
 		}
-		try 
-		{
+		try {
 			$user = Get-ADUser -Identity "$sam" -ErrorAction SilentlyContinue
 			Write-Host "[$rowNum] updating user: $sam" -ForegroundColor Cyan
-		}
-		catch 
-		{
+		} catch {
 			$user = $null
 			Write-Host "[$rowNum] creating user: $sam" -ForegroundColor Green
 			New-ADUser -Name "$sam" `
@@ -163,77 +150,57 @@ else
 				-Enabled:$True -ChangePasswordAtLogon:$FirstLogon
 			$user = Get-ADUser -Identity "$sam"
 		}
-		if ($user -eq $null) 
-		{
+		if (-not $user) {
 			Write-Error "error: [$rowNum] failed to create user account $sam"
 			break
 		}
 		Write-Verbose "info: [$rowNum] account created: $sam"
 
-		foreach ($att in $attlist) 
-		{
-			if ($att -ne "cn") 
-			{
+		foreach ($att in $attlist) {
+			if ($att -ne "cn") {
 				$v = ($row."$att").Trim()
 				if ($v.length -gt 0) {
-					if ($att -like "$ExcludeNames") 
-					{
+					if ($att -like "$ExcludeNames") {
 						Write-Verbose "info: [$rowNum] $sam ($att == $v) IGNORED"
-					}
-					else
-					{
+					} else {
 						Write-Verbose "info: [$rowNum] $sam ($att == $v)"
-						switch ($att.ToUpper()) 
-						{
-							"MSEXCHEXTENSIONATTRIBUTE18" 
-							{
+						switch ($att.ToUpper()) {
+							"MSEXCHEXTENSIONATTRIBUTE18" {
 								Write-Verbose "info: [$rowNum] $sam -- updating GUID value..."
 								$g = (Get-ADUser -Identity $sam | Select-Object -ExpandProperty 'ObjectGUID').guid
 								Set-ADUser -Identity $sam -replace @{"$att"="$g"} -Confirm:$False
 								break
 							}
-							"PROXYADDRESSES" 
-							{
+							"PROXYADDRESSES" {
 								Write-Verbose "info: [$rowNum] $sam -- updating ProxyAddresses list..."
 								$g = $v.Split(";")
 								Set-ADUser -Identity $sam -replace @{"$att"=$g} -Confirm:$False
 								break
 							}
-							"MANAGER" 
-							{
-								try 
-								{
+							"MANAGER" {
+								try {
 									$muser = Get-ADUser $v -ErrorAction SilentlyContinue
-									if ($muser -ne $null)
-									{
+									if ($muser) {
 										Write-Verbose "info: [$rowNum] $sam -- updating manager reference: $v"
 										Set-ADUser $User -replace @{"$att"="$v"} -Confirm:$False
 									}
-								}
-								catch 
-								{
+								} catch {
 									Write-Verbose "error: [$rowNum] $sam -- manager reference is invalid: $v"
 									Write-Warning "[$rownum] manager reference for $sam could not be assigned. Rerun script to assign usable references or add the missing records."
 								}
 								break
 							}
-							default 
-							{
-								try
-								{
+							default {
+								try {
 									Set-ADUser $User -replace @{"$att"="$v"} -Confirm:$False -ErrorAction SilentlyContinue
-								}
-								catch
-								{
+								} catch {
 									Write-Warning "[$rownum] $att could not be assigned"
 								}
 								break
 							}
 						}
 					}
-				}
-				else 
-				{
+				} else {
 					Write-Verbose "info: [$rowNum] $sam ($att == null value)"
 				}
 			}
