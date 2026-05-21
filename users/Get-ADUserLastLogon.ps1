@@ -28,10 +28,10 @@ function Get-ADUserLastLogon {
 	[CmdletBinding()]
 	param (
 		[parameter(
-			Mandatory=$True, 
-			ValueFromPipeline=$True,
-			ValueFromPipelineByPropertyName=$True,
-			HelpMessage="User ID"
+			Mandatory = $True, 
+			ValueFromPipeline = $True,
+			ValueFromPipelineByPropertyName = $True,
+			HelpMessage = "User ID"
 		)]
 		[ValidateNotNullOrEmpty()]
 		[Alias('sAMAccountName','cn')]
@@ -49,18 +49,18 @@ function Get-ADUserLastLogon {
 					$time = $user.LastLogon
 					$props = @{
 						"sAMAccountName" = $userName;
-						"DC" = $hostname;
-						"LastLogon" = [DateTime]::FromFileTime($time);
-						"Status" = 1;
+						"DC"             = $hostname;
+						"LastLogon"      = [DateTime]::FromFileTime($time);
+						"Status"         = 1;
 					}
 					$obj = New-Object -TypeName PSObject -Property $props
 				}
 				else {
 					$props = @{
 						"sAMAccountName" = $userName;
-						"DC" = $hostname;
-						"LastLogon" = 'Never';
-						"Status" = 2;
+						"DC"             = $hostname;
+						"LastLogon"      = 'Never';
+						"Status"         = 2;
 					}
 					$obj = New-Object -TypeName PSObject -Property $props
 				}
@@ -68,9 +68,9 @@ function Get-ADUserLastLogon {
 			catch {
 				$props = @{
 					"sAMAccountName" = $userName;
-					"DC" = $hostname;
-					"LastLogon" = 'Never';
-					"Status" = 0;
+					"DC"             = $hostname;
+					"LastLogon"      = 'Never';
+					"Status"         = 0;
 				}
 				$obj = New-Object -TypeName PSObject -Property $props
 			}
