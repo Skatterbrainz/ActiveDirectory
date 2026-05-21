@@ -35,9 +35,9 @@ function Get-LastLogonTime {
 						$att = $null
 					}
 					[pscustomobject]@{
-						DC = $DC
-						Name = $Name 
-						Type = $ObjectType
+						DC        = $DC
+						Name      = $Name 
+						Type      = $ObjectType
 						LastLogon = $att
 					}
 				}
